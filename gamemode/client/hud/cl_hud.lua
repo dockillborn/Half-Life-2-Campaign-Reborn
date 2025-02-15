@@ -53,14 +53,14 @@ hook.Add( "HUDPaint", "HL2CR_XPBar", function()
 		oldXP = xp
 		newXP = xp
 	end
-	
+
 	if newXP == nil then return end
-	
-	if lastUpdate < CurTime() then 
+
+	if lastUpdate < CurTime() then
 		if fadeOut > 0 then
 			fadeOut = fadeOut - FrameTime() * 255
 		end
-		
+
 		if !Client_Config.HideXP and fadeOut < 30 then
 			fadeOut = 30
 		end
@@ -70,7 +70,7 @@ hook.Add( "HUDPaint", "HL2CR_XPBar", function()
 	local reqXP = LocalPlayer():GetNWInt("hl2cr_stat_expreq")
 
 	local smoothNewXP = 0
-	
+
 	local smoothXP = Lerp( math.Clamp((SysTime() - start) / animationTime,0,1), oldXP, newXP )
 
 	if newXP ~= xp then
@@ -86,13 +86,13 @@ hook.Add( "HUDPaint", "HL2CR_XPBar", function()
 
 	//Fill
 	draw.RoundedBox( 4, (ScrW()-barW) * 0.5, ScrH() / 1.075, math.max( 0, smoothXP ) / reqXP * barW, 45, Color(250, 174, 0, fadeOut) )
-	
+
 	local percentage = xp.."/"..reqXP
 	--local percentage = math.Round((100 * xp) / reqXP, 1) .. "%"
 
 	//Text
 	--draw.SimpleText(translate.Get("HUD_Stat_XP") .. " " .. percentage, "hl2cr_hud_xp", ScrW() / 2.10, ScrH() / 1.05, Color(255, 200, 100, fadeOut), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-	
+
 	draw.SimpleTextOutlined(translate.Get("HUD_Stat_XP") .. " " .. percentage, "hl2cr_hud_xp", ScrW() * 0.5, ScrH() / 1.05, Color(255, 200, 100, fadeOut*1.5), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color( 0, 0, 0, fadeOut * 2 ) )
 
 	if HL2CR_SkillsPoints() > 0 then
@@ -114,13 +114,13 @@ net.Receive("HL2CR_ChatMessage", function()
 end)
 
 local curXPNotify = {}
-local xpTotalText = nil 
+local xpTotalText = nil
 local xpTotal = 0
 local xPosDiv = 2.075
 
 net.Receive("HL2CR_Update_XP", function()
 	lastUpdate = 6 + CurTime()
-	
+
 	local addedXP = net.ReadInt(32)
 	xpTotal = xpTotal + addedXP
 
@@ -161,7 +161,7 @@ net.Receive("HL2CR_Player_NotifyKilled", function()
 end)
 
 hook.Add( "HUDShouldDraw", "HL2CR_HideHUD", function( name )
-	if client_musthidehud[name] and not Administrator.Chat.Chat.OpenOnce then
+	if client_musthidehud[name] then
 		return false
 	end
 
@@ -170,12 +170,12 @@ hook.Add( "HUDShouldDraw", "HL2CR_HideHUD", function( name )
 	elseif client_hidehud[name] and (game.GetMap() == "d1_trainstation_05" and not GetGlobalBool("HL2CR_GLOBAL_SUIT")) then
 		return false
 	end
-	
+
 	if ( name == "CHudCrosshair" and Client_Config.NewCross ) then
 		return false
 	end
-	
-    return true 
+
+    return true
 end)
 
 gameevent.Listen("player_disconnect")
@@ -185,7 +185,7 @@ hook.Add( "player_disconnect", "HL2CR_PlayerDisconnect", function( data )
 	local id = data.userid
 	local bot = data.bot
 	local reason = data.reason
-	
+
 	chat.AddText(Color(240, 175, 0), steamid .. ": " .. name .. translate.Get("Chat_Player_Disconnect"), tostring(reason))
 end)
 
@@ -193,7 +193,7 @@ gameevent.Listen("player_connect_client")
 hook.Add( "player_connect_client", "HL2CR_PlayerConnect", function( data )
 	local name = data.name
 	local id = data.networkid
-		
+
 	if id == "STEAM_0:0:6009886" then
 		surface.PlaySound("hl2cr/admin/itsrifter_join.wav")
 	elseif id == "STEAM_0:1:7832469" then
@@ -222,7 +222,7 @@ hook.Add("PostDrawHUD", "HL2CR_DebugDraw", function()
 
 	local trace = LocalPlayer():GetEyeTrace()
 	local angle = trace.HitNormal:Angle()
-				
+
 	surface.SetDrawColor(Color(0, 0, 0, 255))
 	surface.SetTextPos( ScrW() / 2.5, ScrH() / 1.90 )
 	surface.SetFont("hl2cr_scoreboard_player")
@@ -240,20 +240,20 @@ hook.Add("PostDrawHUD", "HL2CR_TankNPCStatus", function()
 			table.remove(tankNPCs, i)
 			break
 		end
-		
+
 		local healthwidth = ScrW() * 0.24
 		local healthpercent = (healthwidth / t:GetMaxHealth()) * t:Health()
 		local missingpercent = healthwidth-healthpercent
-		
+
 		--outline part
 		surface.SetDrawColor(Color(0, 0, 0, 250))
 		surface.DrawOutlinedRect(ScrW() * xPos -1, ScrH() * 0.4 + yPos * i -1, healthwidth+2, 27)
-		
+
 		--missing part
 		surface.SetDrawColor(Color(10, 10, 10, 100))
 		--surface.DrawRect(ScrW() * xPos, ScrH() * 0.4 + yPos * i, t:GetMaxHealth() / 2, 25)
 		surface.DrawRect(ScrW() * xPos + healthwidth, ScrH() * 0.4 + yPos * i, -missingpercent, 25)
-		
+
 		--health bar
 		surface.SetDrawColor(Color(100, 255, 100,100))
 		--surface.DrawRect(ScrW() * xPos, ScrH() * 0.4 + yPos * i, t:Health() / 2, 25)
@@ -263,7 +263,7 @@ end)
 
 hook.Add("HUDPaint", "HL2CR_Respawn_Timer", function()
 	if LocalPlayer():Alive() then return end
-	
+
 	local resTime = LocalPlayer():GetNWInt("hl2cr_respawntimer")
 
 	if resTime > 0 then
@@ -271,7 +271,7 @@ hook.Add("HUDPaint", "HL2CR_Respawn_Timer", function()
 	else
 		draw.SimpleText(translate.Get("Respawn_Ready"), "hl2cr_respawntimer",  ScrW() / 1.15, ScrH() - 50, Color(255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
-	
+
 end)
 
 hook.Add("HUDPaint", "HL2CR_DrawPetStats", function()
@@ -282,7 +282,7 @@ hook.Add("HUDPaint", "HL2CR_DrawPetStats", function()
 			local dist = LocalPlayer():GetPos():Distance(pet:GetPos())
 			local pos = pet:GetPos()
 				pos.z = pet:GetPos().z + 20 + (dist * 0.0325)
-				
+
 			local ScrPos = pos:ToScreen()
 			if pet:GetOwner() and dist <= 250 then
 				//draw.SimpleText(translate.Get("NPCLevel") .. pet:GetOwner():GetNWInt("pet_level", -1), "HL2CR_NPCStats", ScrPos.x, ScrPos.y - 35, Color(255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -308,15 +308,15 @@ end )
 function VMFix(AW)
 	local vm = LocalPlayer():GetViewModel()
 	--local AW = LocalPlayer():GetActiveWeapon()
-	
+
 	if IsValid(vm) and IsValid(AW) then
-		
+
 		if (AW.ShowViewModel == nil or AW.ShowViewModel) then
 			vm:SetColor(Color(255,255,255,255))
-			vm:SetMaterial()		
+			vm:SetMaterial()
 		else
 			vm:SetColor(Color(255,255,255,1))
-			vm:SetMaterial("vgui/hsv")		
+			vm:SetMaterial("vgui/hsv")
 		end
 	end
 end

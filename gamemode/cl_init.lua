@@ -17,7 +17,7 @@ include("client/interface/cl_fonts.lua")
 include("client/interface/cl_ui_elements.lua")
 include("client/interface/cl_ach_notify.lua")
 include("client/interface/panels/cl_ui_dragpanel.lua")
-include("client/chat/cl_leifchat.lua")
+--include("client/chat/cl_leifchat.lua")
 include("client/hud/cl_crosshair.lua")
 include("client/hud/cl_helpmenu.lua")
 
